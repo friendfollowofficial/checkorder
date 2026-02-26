@@ -73,33 +73,20 @@ body{
   opacity:0;
   filter:blur(25px);
 }
+.logo-wrapper img{
+  width:100%;
+  border-radius:30px;
+  box-shadow:0 20px 60px rgba(255,158,214,.4);
+  transition:.4s;
+  animation:floatLogo 4s ease-in-out infinite;
+}
 
-/* Logo */
-.logo{
-  width:135px;
-  height:135px;
-  border-radius:50%;
-  margin:auto;
-  background:linear-gradient(135deg,#8fd3ff,#caa6ff,#ff9ed6);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:36px;
-  font-weight:700;
-  color:white;
-  position:relative;
-  overflow:hidden;
-  box-shadow:0 0 80px rgba(255,158,214,.7);
+@keyframes floatLogo{
+  0%,100%{transform:translateY(0);}
+  50%{transform:translateY(-8px);}
 }
-.logo:after{
-  content:'';
-  position:absolute;
-  width:200%;
-  height:100%;
-  background:linear-gradient(120deg,transparent,rgba(255,255,255,.85),transparent);
-  transform:translateX(-100%);
-  animation:shine 6s infinite;
-}
+
+  
 @keyframes shine{ to{transform:translateX(100%)} }
 
 h1{
@@ -205,6 +192,8 @@ button:hover{
   animation-duration:2.5s;
 }
 @keyframes spin{ to{transform:rotate(360deg)} }
+
+
 </style>
 </head>
 
@@ -215,13 +204,18 @@ button:hover{
 <div class="bubble" style="left:60%;width:160px;height:160px;animation-duration:30s;"></div>
 
 <div class="card" id="card">
-  <div class="logo">FF</div>
+
+  <div class="logo-wrapper">
+    <img src="logo.png" alt="Friend Follow Logo">
+  </div>
+
   <h1>Friend Follow</h1>
   <div class="today" id="todayText"></div>
 
   <button onclick="enterPortal()">เข้าสู่หน้าเช็คออเดอร์</button>
 
   <div class="note">หากหาออเดอร์ไม่เจอโปรดรอ หรือแจ้งแอดมิน</div>
+
 </div>
 
 <div class="flash" id="flash"></div>
@@ -319,11 +313,11 @@ function animateCount(target){
 
   function update(time){
     const progress = Math.min((time-startTime)/duration,1);
-    const eased = 1-Math.pow(1-progress,3);
+    const eased = 1 - Math.pow(1 - progress, 4);
     const value = Math.floor(start + (target-start)*eased);
 
-    displayEl.innerHTML =
-      "คำสั่งซื้อวันนี้ " + value + " ออเดอร์";
+displayEl.innerHTML =
+  "คำสั่งซื้อวันนี้ " + value.toLocaleString('en-US') + " ออเดอร์";
 
     if(progress<1){
       requestAnimationFrame(update);
@@ -342,8 +336,10 @@ function startRealtime(){
   },8000);
 }
 
-animateCount(calculateCount());
-startRealtime();
+if(displayEl){
+  animateCount(calculateCount());
+  startRealtime();
+}
 
 function enterPortal(){
   const card = document.getElementById("card");
