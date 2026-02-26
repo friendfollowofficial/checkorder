@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Friend Follow | Secure Gateway</title>
+
+<style>
+body{
+  margin:0;
+  font-family:'Segoe UI',Arial;
+  background:linear-gradient(180deg,#efeafd,#e4d9f7,#d7cbee);
+  overflow:hidden;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+
+/* ===== Glow Background ===== */
+.bg-glow{
+  position:absolute;
+  width:500px;
+  height:500px;
+  background:radial-gradient(circle,#caa6ff55,#ff9ed655,transparent 70%);
+  filter:blur(80px);
+  animation:pulse 4s ease-in-out infinite;
+}
+
+@keyframes pulse{
+  0%,100%{transform:scale(1);}
+  50%{transform:scale(1.1);}
+}
+
+/* ===== Card ===== */
+.card{
+  position:relative;
+  width:380px;
+  background:rgba(255,255,255,.85);
+  backdrop-filter:blur(18px);
+  padding:40px;
+  border-radius:30px;
+  text-align:center;
+  box-shadow:0 30px 60px rgba(160,120,240,.25);
+  z-index:2;
+}
+
+/* ===== Logo ===== */
+.logo{
+  width:90px;
+  height:90px;
+  border-radius:50%;
+  margin:auto;
+  background:linear-gradient(90deg,#8fd3ff,#caa6ff,#ff9ed6);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:26px;
+  font-weight:700;
+  color:white;
+  box-shadow:0 15px 40px rgba(180,140,255,.4);
+  animation:float 3s ease-in-out infinite;
+}
+
+@keyframes float{
+  0%,100%{transform:translateY(0);}
+  50%{transform:translateY(-8px);}
+}
+
+h1{
+  margin-top:20px;
+  font-size:24px;
+  color:#9f8af9;
+}
+
+.secure{
+  font-size:13px;
+  color:#16a34a;
+  font-weight:600;
+  margin-top:5px;
+}
+
+/* ===== Button ===== */
+button{
+  width:100%;
+  margin-top:25px;
+  padding:14px;
+  border:none;
+  border-radius:15px;
+  background:linear-gradient(90deg,#8fd3ff,#caa6ff,#ff9ed6);
+  color:white;
+  font-weight:600;
+  font-size:15px;
+  cursor:pointer;
+  transition:.3s;
+  box-shadow:0 10px 25px rgba(180,140,255,.4);
+}
+
+button:hover{
+  transform:translateY(-3px);
+}
+
+/* ===== Loading Screen ===== */
+.loading-screen{
+  position:fixed;
+  inset:0;
+  background:linear-gradient(180deg,#efeafd,#e4d9f7,#d7cbee);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  z-index:999;
+  opacity:0;
+  pointer-events:none;
+  transition:.4s;
+}
+
+.loading-screen.active{
+  opacity:1;
+  pointer-events:auto;
+}
+
+/* Spinner */
+.spinner{
+  width:60px;
+  height:60px;
+  border-radius:50%;
+  border:5px solid #e5e0ff;
+  border-top:5px solid #9f8af9;
+  animation:spin 1s linear infinite;
+}
+
+@keyframes spin{
+  to{transform:rotate(360deg);}
+}
+
+/* Progress Bar */
+.progress{
+  width:220px;
+  height:6px;
+  background:#e5e0ff;
+  border-radius:20px;
+  margin-top:20px;
+  overflow:hidden;
+}
+
+.progress-bar{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,#8fd3ff,#caa6ff,#ff9ed6);
+  animation:loadbar 2s ease forwards;
+}
+
+@keyframes loadbar{
+  to{width:100%;}
+}
+
+.loading-text{
+  margin-top:15px;
+  font-size:14px;
+  color:#7c5cff;
+  font-weight:600;
+}
+</style>
+</head>
+
+<body>
+
+<div class="bg-glow"></div>
+
+<div class="card">
+  <div class="logo">FF</div>
+  <h1>Friend Follow</h1>
+  <div class="secure">🔒 Secure Order Verification Portal</div>
+  <button onclick="startLoading()">เข้าสู่หน้าเช็คออเดอร์</button>
+</div>
+
+<div class="loading-screen" id="loading">
+  <div class="spinner"></div>
+  <div class="progress">
+    <div class="progress-bar"></div>
+  </div>
+  <div class="loading-text">กำลังเข้าสู่ระบบที่ปลอดภัย...</div>
+</div>
+
+<script>
+function startLoading(){
+  const loading = document.getElementById("loading");
+  loading.classList.add("active");
+
+  setTimeout(function(){
+    window.location.href="https://script.google.com/macros/s/AKfycbx6ERKduhNJF_zLOkeMErCuS7t5SPBSw1DoK34VZMUJvapq3Xjp3clbws6SvyFJZiOirw/exec";
+  },2000);
+}
+</script>
+
+</body>
+</html>
