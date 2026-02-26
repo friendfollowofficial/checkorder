@@ -6,116 +6,139 @@
 <title>Friend Follow</title>
 
 <style>
-*{
-  box-sizing:border-box;
-}
+*{box-sizing:border-box;}
 
 body{
   margin:0;
-  font-family:'Segoe UI',Arial;
-  background:linear-gradient(180deg,#efeafd,#e4d9f7,#d7cbee);
+  font-family:'Segoe UI',sans-serif;
+  height:100vh;
+  overflow:hidden;
+  background:#0f0c1a;
   display:flex;
   justify-content:center;
   align-items:center;
-  height:100vh;
-  overflow:hidden;
 }
 
-/* Soft background glow */
+/* ===== Animated Aurora Background ===== */
 .bg{
   position:absolute;
-  width:600px;
-  height:600px;
-  background:radial-gradient(circle,
-    rgba(202,166,255,.35),
-    rgba(255,158,214,.25),
-    transparent 70%);
-  filter:blur(90px);
-  animation:pulse 5s ease-in-out infinite;
+  inset:0;
+  background:
+  radial-gradient(circle at 20% 30%,#8fd3ff55,transparent 40%),
+  radial-gradient(circle at 80% 70%,#ff9ed655,transparent 40%),
+  radial-gradient(circle at 60% 20%,#caa6ff55,transparent 40%);
+  filter:blur(120px);
+  animation:moveBg 18s linear infinite alternate;
 }
 
-@keyframes pulse{
-  0%,100%{transform:scale(1);}
-  50%{transform:scale(1.05);}
+@keyframes moveBg{
+  from{transform:translate(-50px,-50px) scale(1);}
+  to{transform:translate(50px,50px) scale(1.2);}
 }
 
-/* Card */
+/* ===== Glass Card ===== */
 .card{
   position:relative;
-  width:390px;
-  padding:50px 40px;
-  border-radius:36px;
-  background:rgba(255,255,255,.75);
-  backdrop-filter:blur(25px);
-  box-shadow:0 40px 80px rgba(120,90,200,.18);
+  width:420px;
+  padding:60px 50px;
+  border-radius:40px;
+  background:rgba(255,255,255,.06);
+  backdrop-filter:blur(35px);
+  border:1px solid rgba(255,255,255,.15);
   text-align:center;
   z-index:2;
-  transition:.4s;
+  box-shadow:0 0 80px rgba(202,166,255,.25);
+  transition:all .6s cubic-bezier(.22,1,.36,1);
 }
 
+.card.hide{
+  transform:scale(.9);
+  opacity:0;
+  filter:blur(20px);
+}
+
+/* ===== Logo ===== */
 .logo{
-  width:95px;
-  height:95px;
+  width:110px;
+  height:110px;
   border-radius:50%;
   margin:auto;
   background:linear-gradient(135deg,#8fd3ff,#caa6ff,#ff9ed6);
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:28px;
+  font-size:30px;
   font-weight:700;
   color:white;
-  box-shadow:0 20px 45px rgba(160,120,240,.4);
-  animation:float 4s ease-in-out infinite;
+  box-shadow:0 0 50px rgba(255,158,214,.6);
+  animation:float 6s ease-in-out infinite;
 }
 
 @keyframes float{
   0%,100%{transform:translateY(0);}
-  50%{transform:translateY(-10px);}
+  50%{transform:translateY(-15px);}
 }
 
 h1{
-  margin:30px 0 8px;
-  font-size:26px;
-  color:#8e79f6;
+  margin:35px 0 10px;
+  font-size:28px;
+  color:#ffffff;
   letter-spacing:.5px;
 }
 
 .subtitle{
+  color:#c9bfff;
   font-size:14px;
-  color:#7c6bd6;
-  opacity:.85;
+  opacity:.8;
 }
 
-/* Button */
+/* ===== Button ===== */
 button{
-  margin-top:35px;
+  margin-top:40px;
   width:100%;
-  padding:16px;
+  padding:18px;
   border:none;
-  border-radius:20px;
-  font-size:15px;
+  border-radius:25px;
+  font-size:16px;
   font-weight:600;
   cursor:pointer;
-  color:white;
+  color:#fff;
   background:linear-gradient(90deg,#8fd3ff,#caa6ff,#ff9ed6);
-  box-shadow:0 15px 40px rgba(170,130,240,.45);
-  transition:.3s;
+  box-shadow:0 0 40px rgba(202,166,255,.6);
+  transition:.4s cubic-bezier(.22,1,.36,1);
+  position:relative;
+  overflow:hidden;
+}
+
+button:before{
+  content:'';
+  position:absolute;
+  width:120%;
+  height:120%;
+  top:-10%;
+  left:-10%;
+  background:radial-gradient(circle,rgba(255,255,255,.4),transparent 60%);
+  opacity:0;
+  transition:.4s;
 }
 
 button:hover{
-  transform:translateY(-4px);
-  box-shadow:0 25px 50px rgba(160,120,240,.5);
+  transform:translateY(-5px);
+  box-shadow:0 0 70px rgba(255,158,214,.8);
 }
 
-/* ===== Loading Overlay ===== */
+button:hover:before{
+  opacity:.5;
+}
+
+/* ===== Loading Screen ===== */
 .loading{
   position:fixed;
   inset:0;
-  background:linear-gradient(180deg,#efeafd,#e4d9f7,#d7cbee);
   display:flex;
   justify-content:center;
   align-items:center;
+  background:#0f0c1a;
   opacity:0;
   pointer-events:none;
   transition:.4s ease;
@@ -126,13 +149,30 @@ button:hover{
   pointer-events:auto;
 }
 
+/* Cinematic Ring Loader */
 .loader{
-  width:65px;
-  height:65px;
+  width:120px;
+  height:120px;
+  position:relative;
+}
+
+.loader span{
+  position:absolute;
+  inset:0;
   border-radius:50%;
-  border:4px solid rgba(180,150,255,.25);
-  border-top:4px solid #9f8af9;
-  animation:spin 1s linear infinite;
+  border:3px solid transparent;
+  border-top:3px solid #caa6ff;
+  animation:spin 1.2s linear infinite;
+}
+
+.loader span:nth-child(2){
+  border-top:3px solid #8fd3ff;
+  animation-duration:1.6s;
+}
+
+.loader span:nth-child(3){
+  border-top:3px solid #ff9ed6;
+  animation-duration:2s;
 }
 
 @keyframes spin{
@@ -145,26 +185,35 @@ button:hover{
 
 <div class="bg"></div>
 
-<div class="card">
+<div class="card" id="card">
   <div class="logo">FF</div>
   <h1>Friend Follow</h1>
   <div class="subtitle">Order Portal</div>
-
-  <button onclick="go()">เข้าสู่หน้าเช็คออเดอร์</button>
+  <button onclick="start()">เข้าสู่หน้าเช็คออเดอร์</button>
 </div>
 
 <div class="loading" id="loading">
-  <div class="loader"></div>
+  <div class="loader">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
 </div>
 
 <script>
-function go(){
+function start(){
+  const card = document.getElementById("card");
   const loading = document.getElementById("loading");
-  loading.classList.add("active");
+
+  card.classList.add("hide");
+
+  setTimeout(()=>{
+    loading.classList.add("active");
+  },300);
 
   setTimeout(()=>{
     window.location.href="https://script.google.com/macros/s/AKfycbx6ERKduhNJF_zLOkeMErCuS7t5SPBSw1DoK34VZMUJvapq3Xjp3clbws6SvyFJZiOirw/exec";
-  },1200);
+  },1600);
 }
 </script>
 
