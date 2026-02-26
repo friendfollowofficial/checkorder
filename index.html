@@ -235,93 +235,95 @@ button:hover{
 </div>
 
 <script>
-const todayKey = "ff_orders_" + new Date().toISOString().split("T")[0];
 const displayEl = document.getElementById("todayText");
 
-function generateBase(){
-  return Math.floor(Math.random()*25)+35;
+function getThailandNow(){
+  const now = new Date();
+  const utc = now.getTime() + (now.getTimezoneOffset()*60000);
+  return new Date(utc + (7*60*60*1000));
 }
 
-function timeBasedProbability(){
-  const hour = new Date().getHours();
-  if(hour >= 9 && hour <= 21) return 0.45;   // กลางวันเพิ่มไว
-  if(hour >= 22 || hour <= 5) return 0.15;   // ดึกเพิ่มช้า
-  return 0.25;                               // เช้าเพิ่มกลาง ๆ
+function getDaySeed(date){
+  // สร้าง seed จากวันที่ (ทุกคนจะเหมือนกัน)
+  return parseInt(
+    date.getFullYear().toString() +
+    (date.getMonth()+1).toString().padStart(2,'0') +
+    date.getDate().toString().padStart(2,'0')
+  );
 }
 
-function getOrderCount(){
-  let stored = localStorage.getItem(todayKey);
-  if(!stored){
-    const base = generateBase();
-    localStorage.setItem(todayKey, base);
-    return {count: base, inc: 0};
-  }
-
-  let current = parseInt(stored);
-  let inc = 0;
-
-  if(Math.random() < timeBasedProbability()){
-    inc = Math.floor(Math.random()*2)+1;
-    current += inc;
-    localStorage.setItem(todayKey, current);
-  }
-
-  return {count: current, inc: inc};
+function getBaseFromSeed(seed){
+  // base จะได้ 35-59 เหมือนเดิม แต่คงที่ทั้งวัน
+  return 35 + (seed % 25);
 }
 
-function animateCount(target, inc){
-  let start = 0;
-  const last = sessionStorage.getItem("ff_session_count");
-  if(last) start = parseInt(last);
-  if(start > target) start = target;
+function getGrowthRate(hour){
+  if(hour >= 9 && hour <= 21) return 1.2;   // กลางวันไว
+  if(hour >= 22 || hour <= 5) return 0.3;   // ดึกช้า
+  return 0.6;                               
+}
+
+function calculateTodayCount(){
+
+  const now = getThailandNow();
+  const seed = getDaySeed(now);
+  const base = getBaseFromSeed(seed);
+
+  const startOfDay = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+    0,0,0
+  );
+
+  const minutesPassed = Math.floor(
+    (now - startOfDay)/60000
+  );
+
+  const growthRate = getGrowthRate(now.getHours());
+
+  // ใช้สูตร deterministic
+  const growth = Math.floor(
+    minutesPassed * 0.05 * growthRate
+  );
+
+  return base + growth;
+}
+
+function animateCount(target){
 
   const duration = 1000;
   const startTime = performance.now();
+  const start = parseInt(displayEl.dataset.val || 0);
 
   function update(time){
-    const progress = Math.min((time - startTime)/duration,1);
+    const progress = Math.min((time-startTime)/duration,1);
     const eased = 1-Math.pow(1-progress,3);
-    const value = Math.floor(start+(target-start)*eased);
-    displayEl.innerHTML = "คำสั่งซื้อวันนี้ " + value + " ออเดอร์";
+    const value = Math.floor(start + (target-start)*eased);
+
+    displayEl.innerHTML =
+      "คำสั่งซื้อวันนี้ " + value + " ออเดอร์";
+
     if(progress<1){
       requestAnimationFrame(update);
     } else {
-      sessionStorage.setItem("ff_session_count",target);
-      if(inc>0) showPlus(inc);
+      displayEl.dataset.val = target;
     }
   }
+
   requestAnimationFrame(update);
 }
 
-function showPlus(num){
-  const plus = document.createElement("span");
-  plus.className="floating-plus";
-  plus.innerText="+"+num;
-  displayEl.appendChild(plus);
-  setTimeout(()=>plus.remove(),1200);
+// realtime update ทุก 10 วิ
+function startRealtimeCounter(){
+  setInterval(()=>{
+    const count = calculateTodayCount();
+    animateCount(count);
+  },10000);
 }
 
-const result = getOrderCount();
-animateCount(result.count,result.inc);
-
-function enterPortal(){
-  const card = document.getElementById("card");
-  const loading = document.getElementById("loading");
-  const flash = document.getElementById("flash");
-
-  flash.style.opacity="0.7";
-  setTimeout(()=>{flash.style.opacity="0";},150);
-
-  card.classList.add("hide");
-
-  setTimeout(()=>{
-    loading.classList.add("active");
-  },500);
-
-  setTimeout(()=>{
-    window.location.href="https://script.google.com/macros/s/AKfycbzZnlYtKMBqP1_TSE-nwubenatv2OQVMElPVKZ5sEHa-DdCWrrz0-nhAjtI2uAv3YGBTw/exec";
-  },2000);
-}
+animateCount(calculateTodayCount());
+startRealtimeCounter();
 </script>
 
 </body>
