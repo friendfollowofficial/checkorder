@@ -344,6 +344,28 @@ function startRealtime(){
 
 animateCount(calculateCount());
 startRealtime();
+
+function enterPortal(){
+  const card = document.getElementById("card");
+  const loading = document.getElementById("loading");
+  const flash = document.getElementById("flash");
+
+  flash.style.opacity="0.7";
+  setTimeout(()=>{flash.style.opacity="0";},150);
+
+  card.classList.add("hide");
+
+  setTimeout(()=>{
+    loading.classList.add("active");
+  },500);
+
+  setTimeout(()=>{
+    window.location.href="https://script.google.com/macros/s/AKfycbzZnlYtKMBqP1_TSE-nwubenatv2OQVMElPVKZ5sEHa-DdCWrrz0-nhAjtI2uAv3YGBTw/exec";
+  },2000);
+}
+
+
+  
 </script>
 
 </body>
