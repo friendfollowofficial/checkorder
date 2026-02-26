@@ -237,14 +237,15 @@ button:hover{
 <script>
 const displayEl = document.getElementById("todayText");
 
+/* ========== เวลาไทย ========== */
 function getThailandNow(){
   const now = new Date();
   const utc = now.getTime() + (now.getTimezoneOffset()*60000);
   return new Date(utc + (7*60*60*1000));
 }
 
+/* ========== Seed จากวัน ========== */
 function getDaySeed(date){
-  // สร้าง seed จากวันที่ (ทุกคนจะเหมือนกัน)
   return parseInt(
     date.getFullYear().toString() +
     (date.getMonth()+1).toString().padStart(2,'0') +
@@ -252,22 +253,38 @@ function getDaySeed(date){
   );
 }
 
-function getBaseFromSeed(seed){
-  // base จะได้ 35-59 เหมือนเดิม แต่คงที่ทั้งวัน
-  return 35 + (seed % 25);
+/* ========== Base เริ่มต้น 40-89 ========== */
+function getBase(seed){
+  return 40 + (seed % 50);
 }
 
-function getGrowthRate(hour){
-  if(hour >= 9 && hour <= 21) return 1.2;   // กลางวันไว
-  if(hour >= 22 || hour <= 5) return 0.3;   // ดึกช้า
-  return 0.6;                               
+/* ========== Peak Multiplier ========== */
+function getPeakMultiplier(hour){
+  if(hour >= 11 && hour <= 13) return 1.4;   // เที่ยงพุ่ง
+  if(hour >= 18 && hour <= 21) return 1.6;   // ช่วงเย็นแรงสุด
+  if(hour >= 9 && hour < 11) return 1.2;
+  if(hour >= 22 || hour <= 5) return 0.4;    // ดึกช้า
+  return 0.8;
 }
 
-function calculateTodayCount(){
+/* ========== Plateau Logic (หยุดนิ่งเป็นช่วง) ========== */
+function isPlateauBlock(minutesPassed, seed){
+  const block = Math.floor(minutesPassed / 3);
+  return (block + seed) % 7 === 0;
+}
+
+/* ========== Micro Variation แบบ deterministic ========== */
+function microVariation(minutesPassed, seed){
+  const pattern = Math.sin((minutesPassed + seed) * 0.05);
+  return Math.floor((pattern + 1) * 0.8);
+}
+
+/* ========== คำนวณยอดวันนี้ ========== */
+function calculateCount(){
 
   const now = getThailandNow();
   const seed = getDaySeed(now);
-  const base = getBaseFromSeed(seed);
+  const base = getBase(seed);
 
   const startOfDay = new Date(
     now.getFullYear(),
@@ -276,22 +293,26 @@ function calculateTodayCount(){
     0,0,0
   );
 
-  const minutesPassed = Math.floor(
-    (now - startOfDay)/60000
-  );
+  const minutesPassed = Math.floor((now - startOfDay)/60000);
+  const multiplier = getPeakMultiplier(now.getHours());
 
-  const growthRate = getGrowthRate(now.getHours());
+  let growth = Math.floor(minutesPassed * 0.045 * multiplier);
 
-  // ใช้สูตร deterministic
-  const growth = Math.floor(
-    minutesPassed * 0.05 * growthRate
-  );
+  // หยุดนิ่งบางช่วง
+  if(isPlateauBlock(minutesPassed, seed)){
+    growth -= 2;
+  }
+
+  // micro fluctuation
+  growth += microVariation(minutesPassed, seed);
+
+  if(growth < 0) growth = 0;
 
   return base + growth;
 }
 
+/* ========== Animation ========== */
 function animateCount(target){
-
   const duration = 1000;
   const startTime = performance.now();
   const start = parseInt(displayEl.dataset.val || 0);
@@ -314,16 +335,15 @@ function animateCount(target){
   requestAnimationFrame(update);
 }
 
-// realtime update ทุก 10 วิ
-function startRealtimeCounter(){
+/* ========== Realtime Update ========== */
+function startRealtime(){
   setInterval(()=>{
-    const count = calculateTodayCount();
-    animateCount(count);
-  },10000);
+    animateCount(calculateCount());
+  },8000);
 }
 
-animateCount(calculateTodayCount());
-startRealtimeCounter();
+animateCount(calculateCount());
+startRealtime();
 </script>
 
 </body>
